@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmPulse Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="components/sidebar.js"></script>
+    <script src="components/stat-card.js"></script>
+    <script src="components/weather-card.js"></script>
+    <!-- market-card.js removed since we're using market-dashboard.js for the full page -->
+    <script src="components/calendar-card.js"></script>
+    <script src="components/alerts-card.js"></script>
+    <script src="components/quick-actions.js"></script>
+    <script src="components/community-card.js"></script>
+    <!-- Add the weather dashboard component -->
+    <script src="components/weather-dashboard.js"></script>
+    <!-- Add the market dashboard component -->
+    <script src="components/market-dashboard.js"></script>
+    <script src="components/crops-manager.js"></script>
+    <script src="components/farming-calendar.js"></script>
+    <script src="components/expert-advice.js"></script>
+    <script src="components/community-panel.js"></script>
+    <!-- Chart.js for analytics -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="components/reports-analytics.js"></script>
+<script src="components/profile-panel.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="dashboard-container flex">
+        <!-- Sidebar -->
+        <farmpulse-sidebar></farmpulse-sidebar>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto" id="main-content">
+            <!-- Dashboard Section (Default) -->
+            <section id="dashboard-section" class="section-content active">
+                <!-- Welcome Banner -->
+                <section class="welcome-banner bg-gradient-to-r from-green-600 to-green-500 text-white p-6">
+                    <div class="container mx-auto">
+                        <h1 class="text-2xl md:text-3xl font-bold" id="welcomeMessage">Good morning! 👋</h1>
+                        <p class="text-green-100">Here's your farming overview for today</p>
+                        <div class="quick-stats flex flex-wrap gap-4 mt-4">
+                            <stat-card value="14" label="Tasks this week" icon="check-circle"></stat-card>
+                            <stat-card value="7" label="Active alerts" icon="alert-circle" class="bg-orange-100 text-orange-800"></stat-card>
+                            <stat-card value="92%" label="Soil moisture" icon="droplet" class="bg-blue-100 text-blue-800"></stat-card>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Dashboard Widgets -->
+                <div class="container mx-auto p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <weather-card 
+                            temp="28°C" 
+                            condition="Partly Cloudy" 
+                            humidity="65%" 
+                            rain="20%" 
+                            alert="Light rain expected in 2 days">
+                        </weather-card>
+
+                        <!-- Simplified Market Card for Dashboard Overview -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-800">Crop Prices</h3>
+                                <span class="text-green-600 text-sm font-medium">Live</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Maize</span>
+                                    <span class="font-semibold">P 12.50/kg</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Sorghum</span>
+                                    <span class="font-semibold">P 15.50/kg</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Beans</span>
+                                    <span class="font-semibold">P 28.00/kg</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Groundnuts</span>
+                                    <span class="font-semibold">P 32.00/kg</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-gray-100">
+                                <a href="#market" onclick="showSection('market-section')" 
+                                   class="text-green-600 hover:text-green-700 text-sm font-medium flex items-center">
+                                    View all crop prices
+                                    <i data-feather="arrow-right" class="ml-1 w-4 h-4"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <calendar-card>
+                            <calendar-task icon="seedling" task="Plant maize seeds" date="Today" urgent></calendar-task>
+                            <calendar-task icon="droplet" task="Irrigation check" date="Tomorrow"></calendar-task>
+                            <calendar-task icon="sun" task="Apply fertilizer" date="In 3 days"></calendar-task>
+                        </calendar-card>
+
+                        <alerts-card>
+                            <alert-item type="warning" text="Fall Armyworm detected in your area"></alert-item>
+                            <alert-item type="info" text="Optimal planting window opens next week"></alert-item>
+                        </alerts-card>
+
+                        <quick-actions></quick-actions>
+
+                        <community-card>
+                            <community-post author="Kabelo M." text="Just tried the new soil conservation technique - amazing results!"></community-post>
+                            <community-post author="Ministry Alert" text="Market prices in Francistown are rising this week"></community-post>
+                        </community-card>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Weather Section -->
+            <section id="weather-section" class="section-content hidden">
+                <weather-dashboard></weather-dashboard>
+            </section>
+
+            <!-- Market Prices Section -->
+            <section id="market-section" class="section-content hidden">
+                <market-dashboard></market-dashboard>
+            </section>
+
+            <!-- My Crops Section -->
+            <!-- My Crops Section -->
+<section id="crops-section" class="section-content hidden">
+    <div class="bg-gradient-to-r from-yellow-600 to-yellow-500 text-white p-6">
+        <div class="container mx-auto">
+            <h1 class="text-2xl md:text-3xl font-bold">My Crops Management</h1>
+            <p class="text-yellow-100">Manage your crops, track growth, and monitor yields</p>
+        </div>
+    </div>
+    <div class="container mx-auto p-4">
+        <crops-manager></crops-manager>
+    </div>
+</section>
+
+            <!-- Farming Calendar Section -->
+<section id="calendar-section" class="section-content hidden">
+    <div class="bg-gradient-to-r from-blue-600 to-blue-500 text-white p-6">
+        <div class="container mx-auto">
+            <h1 class="text-2xl md:text-3xl font-bold">Farming Calendar</h1>
+            <p class="text-blue-100">Plan and manage your farming activities</p>
+        </div>
+    </div>
+    <div class="container mx-auto p-4">
+        <farming-calendar></farming-calendar>
+    </div>
+</section>
+
+            <!-- Expert Advice Section -->
+<section id="advice-section" class="section-content hidden">
+    <div class="bg-gradient-to-r from-purple-600 to-purple-500 text-white p-6">
+        <div class="container mx-auto">
+            <h1 class="text-2xl md:text-3xl font-bold">Expert Advice</h1>
+            <p class="text-purple-100">Get professional guidance for your farming needs</p>
+        </div>
+    </div>
+    <div class="container mx-auto p-4">
+        <expert-advice></expert-advice>
+    </div>
+</section>
+
+            <!-- Community Section -->
+<section id="community-section" class="section-content hidden">
+    <div class="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white p-6">
+        <div class="container mx-auto">
+            <h1 class="text-2xl md:text-3xl font-bold">Community</h1>
+            <p class="text-indigo-100">Connect with fellow farmers and share experiences</p>
+        </div>
+    </div>
+    <div class="container mx-auto p-4">
+        <community-panel></community-panel>
+    </div>
+</section>
+
+<!-- Reports & Analytics Section -->
+<section id="reports-section" class="section-content hidden">
+    <div class="bg-gradient-to-r from-red-600 to-red-500 text-white p-6">
+        <div class="container mx-auto">
+            <h1 class="text-2xl md:text-3xl font-bold">Reports & Analytics</h1>
+            <p class="text-red-100">Track your farm performance and gain insights</p>
+        </div>
+    </div>
+    <div class="container mx-auto p-4">
+        <reports-analytics></reports-analytics>
+    </div>
+</section>
+
+<!-- Profile Section -->
+<section id="profile-section" class="section-content hidden">
+    <div class="bg-gradient-to-r from-teal-600 to-teal-500 text-white p-6">
+        <div class="container mx-auto">
+            <h1 class="text-2xl md:text-3xl font-bold">My Profile</h1>
+            <p class="text-teal-100">Manage your account settings and preferences</p>
+        </div>
+    </div>
+    <div class="container mx-auto p-4">
+        <profile-panel></profile-panel>
+    </div>
+</section>
+        </main>
+    </div>
+
+    <script>
+        feather.replace();
+        
+        // Navigation function
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section-content').forEach(section => {
+                section.classList.add('hidden');
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                targetSection.classList.add('active');
+            }
+            
+            // Update active state in sidebar
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Update URL hash
+            window.location.hash = sectionId.replace('-section', '');
+        }
+        
+        // Handle initial load and hash changes
+        function handleInitialLoad() {
+            const hash = window.location.hash.replace('#', '');
+            if (hash) {
+                const sectionId = `${hash}-section`;
+                showSection(sectionId);
+            } else {
+                showSection('dashboard-section');
+            }
+        }
+
+        // Listen for sidebar navigation events
+document.addEventListener('sectionChanged', (e) => {
+    const section = e.detail.section;
+    showSection(`${section}-section`);
+});
+        
+        // Listen for hash changes
+        window.addEventListener('hashchange', handleInitialLoad);
+        
+        // Initial load
+        document.addEventListener('DOMContentLoaded', handleInitialLoad);
+
+      // Global profile management
+window.profileManager = {
+    // Method to force refresh profile data across all components
+    refreshProfile: function() {
+        // Dispatch event to notify all components to refresh
+        document.dispatchEvent(new CustomEvent('refreshProfile'));
+        
+        // Also refresh sidebar specifically
+        const sidebar = document.querySelector('farmpulse-sidebar');
+        if (sidebar && sidebar.refreshProfile) {
+            sidebar.refreshProfile();
+        }
+        
+        // Refresh profile panel if it's active
+        const profilePanel = document.querySelector('profile-panel');
+        if (profilePanel && profilePanel.loadProfileData) {
+            profilePanel.loadProfileData();
+        }
+    },
+    
+    // Get current profile data
+    getProfile: function() {
+        return JSON.parse(localStorage.getItem('userProfile') || '{}');
+    }
+};
+
+// Listen for profile updates and refresh sidebar
+document.addEventListener('profileUpdated', (e) => {
+    console.log('Profile updated event received:', e.detail.profileData);
+    
+    // Update sidebar if it exists
+    const sidebar = document.querySelector('farmpulse-sidebar');
+    if (sidebar && sidebar.updateUserProfile) {
+        sidebar.updateUserProfile(e.detail.profileData);
+    }
+});
+
+// Listen for section changes and refresh data when profile section is opened
+document.addEventListener('sectionChanged', (e) => {
+    if (e.detail.section === 'profile') {
+        // Refresh profile data when profile section is opened
+        setTimeout(() => {
+            window.profileManager.refreshProfile();
+        }, 100);
+    }
+});
+
+// Initial profile load
+document.addEventListener('DOMContentLoaded', function() {
+    // Load initial profile data after a short delay to ensure components are loaded
+    setTimeout(() => {
+        window.profileManager.refreshProfile();
+    }, 500);
+});  
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

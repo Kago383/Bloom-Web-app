@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmPulse Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="components/sidebar.js"></script>
+    <script src="components/stat-card.js"></script>
+    <script src="components/weather-card.js"></script>
+    <script src="components/market-card.js"></script>
+    <script src="components/calendar-card.js"></script>
+    <script src="components/alerts-card.js"></script>
+    <script src="components/quick-actions.js"></script>
+    <script src="components/community-card.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="dashboard-container flex">
+        <!-- Sidebar -->
+        <farmpulse-sidebar></farmpulse-sidebar>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Welcome Banner -->
+            <section class="welcome-banner bg-gradient-to-r from-green-600 to-green-500 text-white p-6">
+                <div class="container mx-auto">
+                    <h1 class="text-2xl md:text-3xl font-bold" id="welcomeMessage">Good morning! 👋</h1>
+                    <p class="text-green-100">Here's your farming overview for today</p>
+                    <div class="quick-stats flex flex-wrap gap-4 mt-4">
+                        <stat-card value="14" label="Tasks this week" icon="check-circle"></stat-card>
+                        <stat-card value="7" label="Active alerts" icon="alert-circle" class="bg-orange-100 text-orange-800"></stat-card>
+                        <stat-card value="92%" label="Soil moisture" icon="droplet" class="bg-blue-100 text-blue-800"></stat-card>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dashboard Widgets -->
+            <div class="container mx-auto p-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <weather-card 
+                        temp="28°C" 
+                        condition="Partly Cloudy" 
+                        humidity="65%" 
+                        rain="20%" 
+                        alert="Light rain expected in 2 days">
+                    </weather-card>
+
+                    <market-card>
+                        <market-item crop="Maize" price="P 350/bag"></market-item>
+                        <market-item crop="Sorghum" price="P 420/bag"></market-item>
+                        <market-item crop="Beans" price="P 280/bag"></market-item>
+                    </market-card>
+
+                    <calendar-card>
+                        <calendar-task icon="seedling" task="Plant maize seeds" date="Today" urgent></calendar-task>
+                        <calendar-task icon="droplet" task="Irrigation check" date="Tomorrow"></calendar-task>
+                        <calendar-task icon="sun" task="Apply fertilizer" date="In 3 days"></calendar-task>
+                    </calendar-card>
+
+                    <alerts-card>
+                        <alert-item type="warning" text="Fall Armyworm detected in your area"></alert-item>
+                        <alert-item type="info" text="Optimal planting window opens next week"></alert-item>
+                    </alerts-card>
+
+                    <quick-actions></quick-actions>
+
+                    <community-card>
+                        <community-post author="Kabelo M." text="Just tried the new soil conservation technique - amazing results!"></community-post>
+                        <community-post author="Ministry Alert" text="Market prices in Francistown are rising this week"></community-post>
+                    </community-card>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Check if user is logged in when dashboard loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we have farmer data
+            const farmerData = localStorage.getItem('farmerData');
+            
+            if (!farmerData) {
+                // Redirect to homepage if not logged in
+                alert('Please login to access the dashboard');
+                window.location.href = 'homepage.html';
+                return;
+            }
+            
+            try {
+                // Parse farmer data
+                const farmer = JSON.parse(farmerData);
+                
+                // Update dashboard with farmer information
+                updateDashboardWithFarmerData(farmer);
+                
+                // Add logout functionality
+                setupLogout();
+                
+                // Initialize Feather icons
+                if (typeof feather !== 'undefined') {
+                    feather.replace();
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                alert('Error loading dashboard. Please login again.');
+                localStorage.removeItem('farmerData');
+                window.location.href = 'homepage.html';
+            }
+        });
+
+        function updateDashboardWithFarmerData(farmer) {
+            // Update welcome message
+            const welcomeElement = document.getElementById('welcomeMessage');
+            if (welcomeElement && farmer.name) {
+                const firstName = farmer.name.split(' ')[0];
+                welcomeElement.textContent = `Good morning, ${firstName}! 👋`;
+            }
+            
+            // Update user profile in sidebar - wait for sidebar to load
+            setTimeout(() => {
+                const userNameElement = document.querySelector('.user-profile h3');
+                if (userNameElement && farmer.name) {
+                    userNameElement.textContent = farmer.name;
+                }
+                
+                const userLocationElement = document.querySelector('.user-profile p:nth-child(3)');
+                if (userLocationElement && farmer.location) {
+                    userLocationElement.textContent = farmer.location;
+                }
+                
+                // Update farm type if available
+                const userFarmElement = document.querySelector('.user-profile p:nth-child(4)');
+                if (userFarmElement && farmer.farm_type) {
+                    userFarmElement.textContent = `Farm: ${farmer.farm_type}`;
+                }
+            }, 100);
+            
+            console.log('Dashboard updated for:', farmer.name);
+        }
+
+        function setupLogout() {
+            // Wait for sidebar to load completely
+            setTimeout(() => {
+                // Create logout button
+                const logoutBtn = document.createElement('a');
+                logoutBtn.href = '#';
+                logoutBtn.className = 'nav-item flex items-center px-6 py-3 text-gray-600 hover:bg-green-50 hover:text-green-600 transition-colors border-l-4 border-transparent';
+                logoutBtn.innerHTML = '<i data-feather="log-out" class="w-5 h-5 mr-3"></i> Logout';
+                
+                logoutBtn.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    
+                    try {
+                        const response = await fetch('http://localhost/bloom_app/backend/logout.php');
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            // Clear localStorage and redirect
+                            localStorage.removeItem('farmerData');
+                            window.location.href = 'homepage.html';
+                        }
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                        // Still clear data and redirect
+                        localStorage.removeItem('farmerData');
+                        window.location.href = 'homepage.html';
+                    }
+                });
+                
+                // Add logout button to sidebar navigation
+                const sidebarNav = document.querySelector('.dashboard-nav');
+                if (sidebarNav) {
+                    sidebarNav.appendChild(logoutBtn);
+                    // Refresh icons
+                    if (typeof feather !== 'undefined') {
+                        feather.replace();
+                    }
+                } else {
+                    console.warn('Sidebar navigation not found');
+                }
+            }, 200);
+        }
+
+        // Initialize Feather icons on load
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+    </script>
+
+    <script src="script.js"></script>
+</body>
+</html>
